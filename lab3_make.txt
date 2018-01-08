@@ -3,5 +3,5 @@ gcc -g -pthread -o lab3_write.o lab3_write.c
 gcc -g -pthread -o lab3.o lab3.c
 
 ./lab3.o lab3.exe lab3.bak
-cmp -s lab3.exe lab3.bak
+cmp -s lab2.o lab2.bak
 cmp -s lab3.c lab3_back.c
