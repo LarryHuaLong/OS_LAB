@@ -21,8 +21,9 @@ void *subp1() {									//线程1执行函数定义
 void *subp2() {
 	for (int i = 1;i<=100;i++)  {
 		sem_wait(&sem2);						//P(sem2)
-		printf("%d\n",a);						//打印公共变量的值
+		printf("%4d",a);						//打印公共变量的值
 		sem_post(&sem1);						//V(sem1)
+		putchar(i%10 ? ' ':'\n');				//每行输出10个值
 	}
 	return;
 }

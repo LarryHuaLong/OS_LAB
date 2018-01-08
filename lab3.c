@@ -23,7 +23,6 @@ pid_t pid1 = -1,pid2 = -1;
 key_t shm_key = (key_t)14477;					//申请共享内存用的键值
 
 int main(int argc,char *const argv[]){
-	printf("this is parent\n");
 	if(argc != 3){
 		printf("argc != 3\n");
 		exit(-1);

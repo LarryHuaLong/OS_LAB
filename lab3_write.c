@@ -23,7 +23,6 @@ sem_t* full,*empty;
 key_t shm_key = (key_t)14477;					//申请共享内存用的键值
 
 int main(int argc,char *const argv[]){
-	printf("this is %s\n",argv[0]);
 	int segment_id;
 	char* shard_memory;
 	if(-1 == (segment_id = shmget(shm_key, sizeof(sem_t)*2 + sizeof(BUFFER)*BUFNUM, IPC_CREAT|0666))){	//申请共享内存
@@ -50,7 +49,7 @@ int main(int argc,char *const argv[]){
 		memcpy((void*)&writebuf,(void*)&bufs[buf_index],sizeof(BUFFER));	//从缓存区取数据
 		sem_post(empty);
 		int sizewrited = write(fd,writebuf.buf,writebuf.size);	//向文件中写数据
-		if(sizewrited<= 0)
+		if(sizewrited < 0)
 			printf("write error %d:%s \n",errno,strerror(errno));
 		if(writebuf.size < BUFSIZE)				//如果读到最后一块数据跳出循环
 			break;

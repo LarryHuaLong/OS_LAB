@@ -9,8 +9,8 @@
 #include <time.h>
 #include <dirent.h>
 
-char file_type(mode_t st_mode)
-{//判断文件类型，并返回代表该文件类型的字母
+char file_type(mode_t st_mode)					//判断文件类型，并返回代表该文件类型的字母
+{
 	switch(st_mode & S_IFMT){
 		case S_IFSOCK:return 's';
 		case S_IFLNK:return 'l';
@@ -22,16 +22,16 @@ char file_type(mode_t st_mode)
 		default: return'?';
 	}
 }
-int print_perm(mode_t st_mode)
-{//打印权限信息
-	putchar(st_mode & S_IRUSR ? 'r':'-');//owner读权限
-	putchar(st_mode & S_IWUSR ? 'w':'-');//owner写权限
+int print_perm(mode_t st_mode)					//打印权限信息
+{
+	putchar(st_mode & S_IRUSR ? 'r':'-');		//owner读权限
+	putchar(st_mode & S_IWUSR ? 'w':'-');		//owner写权限
 	putchar(st_mode & S_IXUSR ? (st_mode & S_ISUID ? 's':'x') :(st_mode & S_ISUID ? 'S':'-'));//owner执行权限
-	putchar(st_mode & S_IRGRP ? 'r':'-');//group读权限
-	putchar(st_mode & S_IWGRP ? 'w':'-');//group写权限
+	putchar(st_mode & S_IRGRP ? 'r':'-');		//group读权限
+	putchar(st_mode & S_IWGRP ? 'w':'-');		//group写权限
 	putchar(st_mode & S_IXGRP ? (st_mode & S_ISGID ? 's':'x') :(st_mode & S_ISGID ? 'S':'-'));//group执行权限
-	putchar(st_mode & S_IROTH ? 'r':'-');//others读权限
-	putchar(st_mode & S_IWOTH ? 'w':'-');//others写权限
+	putchar(st_mode & S_IROTH ? 'r':'-');		//others读权限
+	putchar(st_mode & S_IWOTH ? 'w':'-');		//others写权限
 	putchar(st_mode & S_IXOTH ? (st_mode & S_ISVTX ? 't':'x') :(st_mode & S_ISVTX ? 'T':'-'));//others执行权限
 	return 0;
 }
@@ -53,22 +53,21 @@ void printdir(char *dirpath,char *dirname)
 		sprintf(path,"%s/%s",dirpath,dirname);
 	else
 		sprintf(path,"%s",dirname);
-	printf("%s:\n",path);//显示当前遍历的路径名
-
-	if(NULL == (p_dir = opendir(dirname))){//打开文件目录
+	printf("%s:\n",path);						//显示当前遍历的路径名
+	if(NULL == (p_dir = opendir(dirname))){		//打开文件目录
 		perror("opendir");
 		return;
 	}
-	if(-1 == chdir(dirname)){//将dirname设置为当前目录
+	if(-1 == chdir(dirname)){					//将dirname设置为当前目录
 		perror("chdir");
 		return;
 	}
 	int maxsize = 0;
 	int total_512B_blocks = 0;
-	while(NULL != (p_dirent = readdir(p_dir))){//读取每个目录项，输出属性
+	while(NULL != (p_dirent = readdir(p_dir))){	//读取每个目录项，输出属性
 		if('.' == p_dirent->d_name[0])
-			continue;//忽略 "."、".."和隐藏文件
-		if(-1 == lstat(p_dirent->d_name,&statbuf)){//获取当前目录项的属性
+			continue;							//忽略 "."、".."和隐藏文件
+		if(-1 == lstat(p_dirent->d_name,&statbuf)){	//获取当前目录项的属性
 			perror(p_dirent->d_name);
 			return;
 		}
@@ -76,35 +75,35 @@ void printdir(char *dirpath,char *dirname)
 			maxsize = statbuf.st_size;
 		total_512B_blocks += statbuf.st_blocks;
 	}
-	printf("total %d\n",total_512B_blocks / 2);//显示当前目录包含的总块数
+	printf("total %d\n",total_512B_blocks / 2);	//显示当前目录包含的总块数
 	int maxsizelen = 1;
 	while(maxsize /= 10)
 		maxsizelen++;
-	rewinddir(p_dir);//目录流定位到开始
-	while(NULL != (p_dirent = readdir(p_dir))){//读取每个目录项，输出属性
+	rewinddir(p_dir);							//目录流定位到开始
+	while(NULL != (p_dirent = readdir(p_dir))){	//读取每个目录项，输出属性
 		if('.' == p_dirent->d_name[0])
-			continue;//忽略 "."、".."和隐藏文件
-		if(-1 == lstat(p_dirent->d_name,&statbuf)){//获取当前目录项的属性
+			continue;							//忽略 "."、".."和隐藏文件
+		if(-1 == lstat(p_dirent->d_name,&statbuf)){	//获取当前目录项的属性
 			perror(p_dirent->d_name);
 			return;
 		}
-		p_time = localtime(&statbuf.st_mtime);//转换时间格式
-		p_passwd = getpwuid(statbuf.st_uid);//获取用户名
-		p_group = getgrgid(statbuf.st_gid);//获取用户组名
+		p_time = localtime(&statbuf.st_mtime);	//转换时间格式
+		p_passwd = getpwuid(statbuf.st_uid);	//获取用户名
+		p_group = getgrgid(statbuf.st_gid);		//获取用户组名
 		putchar(file_type(statbuf.st_mode));	//输出文件类型
 		print_perm(statbuf.st_mode);			//输出访问权限信息
 		printf(" %d %s %s %*d %s %2d %02d:%02d %s",
-				(int)statbuf.st_nlink,				//连接数
+				(int)statbuf.st_nlink,			//连接数
 				p_passwd->pw_name,				//拥有者用户名
 				p_group->gr_name,				//拥有组名
-				maxsizelen,//控制文件大小显示的长度
+				maxsizelen,						//控制文件大小显示的长度
 				(int)statbuf.st_size,			//文件大小
-				months[p_time->tm_mon],			// 最后
-				p_time->tm_mday,				// 一次
-				p_time->tm_hour,				// 修改
-				p_time->tm_min,					// 时间
+				months[p_time->tm_mon],			//最后一次修改时间
+				p_time->tm_mday,
+				p_time->tm_hour,
+				p_time->tm_min,
 				p_dirent->d_name);				//文件名
-		if('l' == file_type(statbuf.st_mode)){//如果是符号连接文件
+		if('l' == file_type(statbuf.st_mode)){	//如果是符号连接文件,则读取连接的内容并显示
 			static char buf[256] = "";
 			int len = 0;
 			if(-1 == (len = readlink(p_dirent->d_name,buf,256))){
@@ -116,22 +115,20 @@ void printdir(char *dirpath,char *dirname)
 		else
 			putchar('\n');
 	}
-
-	rewinddir(p_dir);//目录流定位到开始
-	while(NULL != (p_dirent = readdir(p_dir))){//读到一个目录项
+	rewinddir(p_dir);							//目录流定位到开始
+	while(NULL != (p_dirent = readdir(p_dir))){	//读到一个目录项
 		if('.' == p_dirent->d_name[0])
-			continue;//忽略 ".\"、"..\"和隐藏文件
+			continue;							//忽略 ".\"、"..\"和隐藏文件
 		if(-1 == lstat(p_dirent->d_name,&statbuf)){
 			perror(p_dirent->d_name);
 			return;
 		}
-		if('d' == file_type(statbuf.st_mode)){//如果是目录文件
-			putchar('\n');//空行
-			printdir(path,p_dirent->d_name);//递归调用printdir,打印子目录的信息
+		if('d' == file_type(statbuf.st_mode)){	//如果是目录文件
+			putchar('\n');						//空行
+			printdir(path,p_dirent->d_name);	//递归调用printdir,打印子目录的信息
 		}
 	}
-	
-	if(-1 == chdir("..")){//返回上级目录
+	if(-1 == chdir("..")){						//返回上级目录
 		perror("chdir (\"..\")");
 		return;
 	}
@@ -139,6 +136,6 @@ void printdir(char *dirpath,char *dirname)
 	return;
 }
 int main(){
-	printdir("",".");//遍历当前目录
+	printdir("",".");							//遍历当前目录
 	return 0;
 }

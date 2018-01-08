@@ -35,12 +35,12 @@ int main(){
 		int* a = (int*)shard_memory;
 		for (int i = 1;i<=100;i++){
 			sem_wait(sem2);
-			printf("%d\n",*a);
+			printf("%4d",*a);
 			sem_post(sem1);
+			putchar(i%10 ? ' ':'\n');			//每行输出10个值
 		}
 		exit(0);
 	}
-	printf("parent");
 	int status1, status2;
 	wait(&status1);								//等待两个进程结束
 	wait(&status2);
