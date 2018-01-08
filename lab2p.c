@@ -14,7 +14,6 @@ pid_t pid1 = -1,pid2 = -1;
 int main() 	{
 	int segment_id;
 	char* shard_memory;
-	struct shmid_ds shmbuffer;
 	segment_id = shmget(IPC_PRIVATE,sizeof(int)+sizeof(sem_t)*2,0600);
 	shard_memory = (char*)shmat(segment_id,0,0);
 	*((int*)shard_memory) = 0;
